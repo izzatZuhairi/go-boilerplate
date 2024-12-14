@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	database "skeleton/internal/db"
 	"skeleton/internal/router"
 
 	"go.uber.org/zap"
@@ -19,7 +21,11 @@ func main() {
 		logger: logger,
 	}
 
+	database.InitDBConnections(logger)
+
 	r := router.InitRouter()
 
-	logger.Fatal(app.run(r))
+	if err := app.run(r); err != nil {
+		log.Fatalf("server error: %v", err)
+	}
 }
