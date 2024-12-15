@@ -20,9 +20,9 @@ func UserModel() *BaseModel {
 }
 
 type User struct {
-	ID    bson.ObjectID `bson:"_id"`
-	Name  string        `bson:"name"`
-	Email string        `bson:"email"`
+	ID    bson.ObjectID `bson:"_id" json:"_id"`
+	Name  string        `bson:"name" json:"name"`
+	Email string        `bson:"email" json:"email"`
 }
 
 type CreateUserData struct {
@@ -40,6 +40,8 @@ func (mod *BaseModel) GetAllUser() ([]User, error) {
 		}
 		panic(err)
 	}
+
+	defer cur.Close(context.Background())
 
 	if err = cur.All(context.TODO(), &results); err != nil {
 		panic(err)

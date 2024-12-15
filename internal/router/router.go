@@ -36,5 +36,9 @@ func InitRouter() http.Handler {
 		r.Post("/create", controller.CreateUser)
 	})
 
+	r.Route("/student", func(r chi.Router) {
+		r.Post("/create", controller.CreateStudentAndUser)
+	})
+
 	return r
 }
