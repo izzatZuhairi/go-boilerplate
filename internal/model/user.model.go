@@ -26,8 +26,8 @@ type User struct {
 }
 
 type CreateUserData struct {
-	Name  string `bson:"name" json:"name"`
-	Email string `bson:"email" json:"email"`
+	Name  string `bson:"name" json:"name" validate:"required,max=100"`
+	Email string `bson:"email" json:"email" validate:"required,max=100"`
 }
 
 func (mod *BaseModel) GetAllUser() ([]User, error) {
