@@ -1,14 +1,15 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 	"skeleton/common"
 	"skeleton/internal/model"
+	"skeleton/internal/service"
+	"skeleton/internal/validator"
 )
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := model.UserModel().GetAllUser()
+	users, err := service.GetAllUser()
 	if err != nil {
 		common.Json(w, http.StatusInternalServerError, err.Error(), false)
 		return
@@ -20,13 +21,17 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userData model.CreateUserData
 
-	err := json.NewDecoder(r.Body).Decode(&userData)
-	if err != nil {
+	if err := validator.ReadJSON(w, r, &userData); err != nil {
 		common.Json(w, http.StatusBadRequest, err.Error(), false)
 		return
 	}
 
-	userId, err := model.UserModel().CreateUser(userData)
+	if err := validator.Validate.Struct(&userData); err != nil {
+		common.Json(w, http.StatusBadRequest, err.Error(), false)
+		return
+	}
+
+	userId, err := service.CreateUser(userData)
 	if err != nil {
 		common.Json(w, http.StatusInternalServerError, err.Error(), false)
 	}
