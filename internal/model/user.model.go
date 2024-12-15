@@ -25,6 +25,11 @@ type User struct {
 	Email string        `bson:"email"`
 }
 
+type CreateUserData struct {
+	Name  string `bson:"name" json:"name"`
+	Email string `bson:"email" json:"email"`
+}
+
 func (mod *BaseModel) GetAllUser() ([]User, error) {
 	var results []User
 
@@ -41,4 +46,13 @@ func (mod *BaseModel) GetAllUser() ([]User, error) {
 	}
 
 	return results, nil
+}
+
+func (mod *BaseModel) CreateUser(body CreateUserData) (interface{}, error) {
+	result, err := mod.Collection.InsertOne(context.TODO(), bson.M{"name": body.Name, "email": body.Email})
+	if err != nil {
+		return nil, err
+	}
+
+	return result.InsertedID, nil
 }

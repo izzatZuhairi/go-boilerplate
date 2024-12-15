@@ -1,9 +1,8 @@
 package router
 
 import (
-	"encoding/json"
 	"net/http"
-	"skeleton/internal/model"
+	"skeleton/internal/controller"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -32,24 +31,9 @@ func InitRouter() http.Handler {
 		})
 	})
 
-	// MongoClientUris := MongoClientUris{
-	// 	userClientUri: config.LoadConfig("MONGO_DB1_URI"),
-	// }
-	//
-	// user_client, _ := database.GetMongoClient(MongoClientUris.userClientUri)
-	// user_handler := handler.NewHandler(user_client)
-	//
 	r.Route("/user", func(r chi.Router) {
-		r.Get("/list", func(w http.ResponseWriter, r *http.Request) {
-			results, err := model.UserModel().GetAllUser()
-			if err != nil {
-				panic(err)
-			}
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(200)
-			json.NewEncoder(w).Encode(results)
-		})
+		r.Get("/list", controller.GetAllUsers)
+		r.Post("/create", controller.CreateUser)
 	})
 
 	return r
