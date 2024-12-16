@@ -5,9 +5,9 @@ import (
 	"skeleton/config"
 	"time"
 
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 	"go.uber.org/zap"
 )
 
@@ -21,13 +21,15 @@ func connectMongoDB(connStr string, dbName string, logger *zap.SugaredLogger) (*
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	cancel()
-
-	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		panic(err)
-	}
+	defer cancel()
 
 	db := client.Database(dbName)
+
+	var result bson.M
+	if err := db.RunCommand(ctx, bson.D{{"ping", 1}}).Decode(&result); err != nil {
+		logger.Fatalf("Unable to ping database")
+		panic(err)
+	}
 
 	logger.Infow("Connected to db successfully", "db", dbName)
 
@@ -43,6 +45,7 @@ func initMongoDB(dbName string, connStr string, logger *zap.SugaredLogger) {
 	db, err := connectMongoDB(connStr, dbName, logger)
 	if err != nil {
 		logger.Fatalf("No mongodb connection found for database '%s'", dbName)
+		panic(err)
 	}
 
 	connections[dbName] = db

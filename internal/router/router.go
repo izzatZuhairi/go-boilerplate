@@ -17,6 +17,8 @@ type MongoClientUris struct {
 func InitRouter() http.Handler {
 	r := chi.NewRouter()
 
+	c := controller.NewController()
+
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
@@ -32,12 +34,12 @@ func InitRouter() http.Handler {
 	})
 
 	r.Route("/user", func(r chi.Router) {
-		r.Get("/list", controller.GetAllUsers)
-		r.Post("/create", controller.CreateUser)
+		r.Get("/list", c.GetAllUsers)
+		r.Post("/create", c.CreateUser)
 	})
 
 	r.Route("/student", func(r chi.Router) {
-		r.Post("/create", controller.CreateStudentAndUser)
+		r.Post("/create", c.CreateStudentAndUser)
 	})
 
 	return r

@@ -9,7 +9,7 @@ import (
 	"skeleton/types"
 )
 
-func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := service.GetAllUser()
 	if err != nil {
 		common.Json(w, http.StatusInternalServerError, err.Error(), false)
@@ -19,7 +19,7 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	common.Json(w, http.StatusOK, "List Users", users)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userData model.CreateUserData
 
 	if err := validator.ReadJSON(w, r, &userData); err != nil {
@@ -41,7 +41,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	common.Json(w, http.StatusOK, "User Id", userId)
 }
 
-func CreateStudentAndUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) CreateStudentAndUser(w http.ResponseWriter, r *http.Request) {
 	var input types.CreateUserAndStudent
 
 	if err := validator.ReadJSON(w, r, &input); err != nil {
