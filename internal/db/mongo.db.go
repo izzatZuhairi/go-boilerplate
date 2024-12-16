@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -17,6 +18,11 @@ func GetMongoClient(uri string) (*mongo.Client, error) {
 
 	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	cancel()
+
+	log.Println("Attempting to connect to DB")
+	if err := client.Ping(context.Background(), nil); err != nil {
+		panic(err)
+	}
 
 	return client, nil
 }
