@@ -11,3 +11,13 @@
 1. auth
 2. dockerfile
 3. yaml file for deployment
+
+### Running the api
+
+1. go run cmd/api/\*.go
+
+OR
+[install air]
+<https://github.com/air-verse/air>
+
+2. air

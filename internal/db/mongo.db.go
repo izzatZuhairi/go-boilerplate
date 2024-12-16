@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 	"go.uber.org/zap"
 )
 
@@ -19,8 +20,12 @@ func connectMongoDB(connStr string, dbName string, logger *zap.SugaredLogger) (*
 		return nil, err
 	}
 
-	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	cancel()
+
+	if err := client.Ping(ctx, readpref.Primary()); err != nil {
+		panic(err)
+	}
 
 	db := client.Database(dbName)
 
