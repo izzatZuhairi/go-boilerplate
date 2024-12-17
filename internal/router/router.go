@@ -2,23 +2,13 @@ package router
 
 import (
 	"net/http"
-	"skeleton/config"
-	database "skeleton/internal/db"
-	"skeleton/internal/handler"
+	"skeleton/internal/controller"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
+	"github.com/go-chi/render"
 )
-
-// type MongoClient interface {
-// 	client() string
-// }
-//
-// func GetClient(uri string) (*mongo.Client, error) {
-// 	return database.GetMongoClient(uri)
-// }
 
 type MongoClientUris struct {
 	userClientUri string
@@ -27,17 +17,14 @@ type MongoClientUris struct {
 func InitRouter() http.Handler {
 	r := chi.NewRouter()
 
+	c := controller.NewController()
+
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(cors.Handler(cors.Options{
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
 
+	r.Use(render.SetContentType(render.ContentTypeJSON))
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/health", func(r chi.Router) {
@@ -46,15 +33,13 @@ func InitRouter() http.Handler {
 		})
 	})
 
-	MongoClientUris := MongoClientUris{
-		userClientUri: config.LoadConfig("MONGO_DB1_URI"),
-	}
-
-	user_client, _ := database.GetMongoClient(MongoClientUris.userClientUri)
-	user_handler := handler.NewHandler(user_client)
-
 	r.Route("/user", func(r chi.Router) {
-		r.Get("/list", user_handler.GetUsers)
+		r.Get("/list", c.GetAllUsers)
+		r.Post("/create", c.CreateUser)
+	})
+
+	r.Route("/student", func(r chi.Router) {
+		r.Post("/create", c.CreateStudentAndUser)
 	})
 
 	return r
