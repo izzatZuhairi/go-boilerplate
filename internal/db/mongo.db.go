@@ -26,7 +26,8 @@ func connectMongoDB(connStr string, dbName string, logger *zap.SugaredLogger) (*
 	db := client.Database(dbName)
 
 	var result bson.M
-	if err := db.RunCommand(ctx, bson.D{{"ping", 1}}).Decode(&result); err != nil {
+	logger.Infow("Attempting to connect")
+	if err := db.RunCommand(ctx, bson.D{{Key: "ping", Value: 1}}).Decode(&result); err != nil {
 		logger.Fatalf("Unable to ping database")
 		panic(err)
 	}
